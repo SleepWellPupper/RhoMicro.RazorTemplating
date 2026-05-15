@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="RhoMicro.RazorTemplating.Tests/RhoMicro.RazorTemplating.Tests.csproj" />
+  <Project Path="RhoMicro.RazorTemplating/RhoMicro.RazorTemplating.csproj" />
+</Solution>
