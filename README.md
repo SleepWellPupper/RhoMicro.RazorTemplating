@@ -159,6 +159,32 @@ public class MyEmailService(
 }
 ```
 
+Define inter-template dependencies for reusability:
+```cs
+using RhoMicro.RazorTemplating;
+
+var myLayout = RazorTemplate.Create(
+    "Layout",
+    """
+    @namespace MyTemplates
+    <outer>@(ChildContent)</outer>
+    
+    @code
+    {
+        [Parameter]
+        public RenderFragment? ChildContent { get; set; }
+    }
+    """);
+var myTemplate = RazorTemplate.Create(
+    "Template",
+    """
+    <MyTemplates.Layout>
+        <inner>foo</inner>
+    </MyTemplates.Layout>
+    """,
+    dependencis: ["Layout"])
+```
+
 ### Lifetimes And Caching
 
 `RazorTemplate` objects own and manage the compiled template type, but they are managed by a cache.
