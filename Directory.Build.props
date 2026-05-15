@@ -14,6 +14,8 @@
   <PropertyGroup Label="PackageInfo">
     <IsPackable>false</IsPackable>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <DebugSymbols>true</DebugSymbols>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
     <Authors>Paul Braetz</Authors>
