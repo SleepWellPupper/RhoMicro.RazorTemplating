@@ -5,8 +5,9 @@ This is a library for compiling razor templates at runtime.
 > [!WARNING]  
 > This package uses an unsupported and unofficial dependency for obtaining 
 > the `RazorSourceGenerator` used when compiling razor templates.
-> This means that language features past net8 are not necessarily supported and
-> may not be downstreamed from the razor toolchain in the future.
+> This means that razor language features past net8 are not necessarily 
+> supported and may not be downstreamed from the razor toolchain in the 
+> future.
 
 ## Licensing
 
