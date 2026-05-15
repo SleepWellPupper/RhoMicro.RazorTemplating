@@ -2,7 +2,6 @@
 
 namespace RhoMicro.RazorTemplating;
 
-using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
