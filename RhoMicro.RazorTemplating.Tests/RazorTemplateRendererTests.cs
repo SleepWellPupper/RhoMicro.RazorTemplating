@@ -1,6 +1,7 @@
+// SPDX-License-Identifier: MPL-2.0
+
 namespace RhoMicro.RazorTemplating.Tests;
 
-using System.Runtime.CompilerServices;
 using Meziantou.Extensions.Logging.Xunit.v3;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Rendering;
