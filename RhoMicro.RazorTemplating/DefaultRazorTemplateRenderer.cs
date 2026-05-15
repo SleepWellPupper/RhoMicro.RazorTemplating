@@ -22,7 +22,7 @@ internal sealed partial class DefaultRazorTemplateRenderer(
         var now = Stopwatch.GetTimestamp();
         LogRendering(logger, name);
 
-        var componentTypeLifetime = await context.GetComponentType(name, ct);
+        var componentTypeLifetime = await context.GetComponentType(name, ct).ConfigureAwait(false);
 
         if (componentTypeLifetime is null)
         {
@@ -33,14 +33,19 @@ internal sealed partial class DefaultRazorTemplateRenderer(
 
         var parametersMap = parameters.ToDictionary();
 
+        String html;
         var htmlRenderer = new HtmlRenderer(services, loggers);
-        var html = await htmlRenderer.Dispatcher.InvokeAsync(async () =>
+        await using (htmlRenderer.ConfigureAwait(false))
         {
-            var parameterView = ParameterView.FromDictionary(parametersMap);
-            var output = await htmlRenderer.RenderComponentAsync(componentTypeLifetime.Type, parameterView);
+            html = await htmlRenderer.Dispatcher.InvokeAsync(async () =>
+            {
+                var parameterView = ParameterView.FromDictionary(parametersMap);
+                var output = await htmlRenderer.RenderComponentAsync(componentTypeLifetime.Type, parameterView)
+                    .ConfigureAwait(false);
 
-            return output.ToHtmlString();
-        });
+                return output.ToHtmlString();
+            }).ConfigureAwait(false);
+        }
 
         var elapsed = Stopwatch.GetElapsedTime(now);
         LogDoneRendering(

@@ -4,6 +4,7 @@ namespace RhoMicro.RazorTemplating;
 
 using System.Collections.Immutable;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Text;
 using Basic.Reference.Assemblies;
@@ -30,7 +31,7 @@ internal sealed partial class RazorTemplateCompiler(
         {
             ct.ThrowIfCancellationRequested();
 
-            await CollectDependencies(root);
+            await CollectDependencies(root).ConfigureAwait(false);
         }
 
         private async ValueTask CollectDependencies(RazorTemplate template)
@@ -51,9 +52,9 @@ internal sealed partial class RazorTemplateCompiler(
                     continue;
                 }
 
-                var dependencyTemplate = await templates.LoadTemplate(dependency);
+                var dependencyTemplate = await templates.LoadTemplate(dependency).ConfigureAwait(false);
 
-                await CollectDependencies(dependencyTemplate);
+                await CollectDependencies(dependencyTemplate).ConfigureAwait(false);
             }
         }
 
@@ -145,7 +146,7 @@ internal sealed partial class RazorTemplateCompiler(
         var now = Stopwatch.GetTimestamp();
         LogCompiling(logger, root);
 
-        var dependencies = await GetDependencies(root, ct);
+        var dependencies = await GetDependencies(root, ct).ConfigureAwait(false);
 
         LogResolvedTemplateDependencies(logger, dependencies);
 
@@ -156,12 +157,13 @@ internal sealed partial class RazorTemplateCompiler(
             dependencies,
             dependencyReferences,
             additionalPeStreams,
-            ct);
+            ct).ConfigureAwait(false);
 
         ComponentTypeLifetime result;
-        await using (var peStream = new MemoryStream())
+        var peStream = new MemoryStream();
+        await using (peStream.ConfigureAwait(false))
         {
-            await Compile(root, dependencyReferences, peStream, ct);
+            await Compile(root, dependencyReferences, peStream, ct).ConfigureAwait(false);
             result = ComponentTypeLifetime.Create(peStream, additionalPeStreams);
         }
 
@@ -169,7 +171,7 @@ internal sealed partial class RazorTemplateCompiler(
         {
             ct.ThrowIfCancellationRequested();
 
-            await additionalPeStream.DisposeAsync();
+            await additionalPeStream.DisposeAsync().ConfigureAwait(false);
         }
 
         var elapsed = Stopwatch.GetElapsedTime(now);
@@ -200,7 +202,7 @@ internal sealed partial class RazorTemplateCompiler(
                 dependencyReferences,
                 additionalPeStreams,
                 i,
-                ct);
+                ct).ConfigureAwait(false);
 
             var elapsedTime = Stopwatch.GetElapsedTime(now);
             LogDoneCompilingDependency(logger, dependency.Name, elapsedTime);
@@ -217,12 +219,12 @@ internal sealed partial class RazorTemplateCompiler(
         ct.ThrowIfCancellationRequested();
 
         var additionalPeStream = new MemoryStream();
-        await Compile(dependency, dependencyReferences, additionalPeStream, ct);
+        await Compile(dependency, dependencyReferences, additionalPeStream, ct).ConfigureAwait(false);
 
         additionalPeStream.Seek(0, SeekOrigin.Begin);
         using (var copyStream = new MemoryStream())
         {
-            await additionalPeStream.CopyToAsync(copyStream, ct);
+            await additionalPeStream.CopyToAsync(copyStream, ct).ConfigureAwait(false);
             copyStream.Seek(0, SeekOrigin.Begin);
             var reference = MetadataReference.CreateFromStream(copyStream);
             dependencyReferences.Add(dependency.Name, reference);
@@ -241,7 +243,7 @@ internal sealed partial class RazorTemplateCompiler(
             root,
             ct);
 
-        await depTreeBuilder.CollectDependencies();
+        await depTreeBuilder.CollectDependencies().ConfigureAwait(false);
 
         if (depTreeBuilder.GetCycles() is [_, ..] cycles)
         {
@@ -268,7 +270,7 @@ internal sealed partial class RazorTemplateCompiler(
         var parseOptions = new CSharpParseOptions(LanguageVersion.Latest)
             .WithFeatures([new("use-roslyn-tokenizer", "true")]);
         var initialCompilation = CreateInitialCompilation(razorTemplate, parseOptions, metadataReferences, ct);
-        var razorSourceText = await RazorSourceText.Create(razorTemplate, ct);
+        var razorSourceText = await RazorSourceText.Create(razorTemplate, ct).ConfigureAwait(false);
         var generatorDriver = CreateGeneratorDriver(razorSourceText, parseOptions, ct);
         var compilation = CreateFinalCompilation(generatorDriver, initialCompilation, ct);
         EmitAssembly(compilation, peStream, ct);
@@ -325,7 +327,7 @@ internal sealed partial class RazorTemplateCompiler(
         }
     }
 
-    private void ThrowUnableToEmitAssembly() => throw new InvalidOperationException("Unable to emit assembly.");
+    private static void ThrowUnableToEmitAssembly() => throw new InvalidOperationException("Unable to emit assembly.");
 
     private Compilation CreateFinalCompilation(
         CSharpGeneratorDriver generatorDriver,
@@ -429,7 +431,7 @@ internal sealed partial class RazorTemplateCompiler(
         {
             ct.ThrowIfCancellationRequested();
 
-            resultBuilder.AppendLine($"global using {@using};");
+            resultBuilder.AppendLine(CultureInfo.InvariantCulture, $"global using {@using};");
         }
 
         var result = resultBuilder.ToString();

@@ -29,7 +29,7 @@ public static class RazorTemplateRenderer
         String text,
         IEnumerable<KeyValuePair<String, Object?>> parameters,
         CancellationToken ct = default)
-        => Render(text, parameters, static s => { }, ct);
+        => Render(text, parameters, static _ => { }, ct);
 
     /// <summary>
     /// <inheritdoc cref="Render(String, IEnumerable{KeyValuePair{String, Object}}, Action{IServiceCollection}, CancellationToken)"/>
@@ -46,7 +46,7 @@ public static class RazorTemplateRenderer
     public static ValueTask<String> Render(
         String text,
         CancellationToken ct = default)
-        => Render(text, [], static s => { }, ct);
+        => Render(text, [], static _ => { }, ct);
 
     /// <summary>
     /// <inheritdoc cref="Render(String, IEnumerable{KeyValuePair{String, Object}}, Action{IServiceCollection}, CancellationToken)"/>
@@ -93,13 +93,16 @@ public static class RazorTemplateRenderer
         Action<IServiceCollection> configureServices,
         CancellationToken ct = default)
     {
+        ArgumentNullException.ThrowIfNull(configureServices);
+
         const String name = "Template";
+
+        using var template = RazorTemplate.Create(name, text);
+        var templateProvider = new InMemoryRazorTemplateProvider(template);
 
         var services = new ServiceCollection()
             .AddRazorTemplating()
-            .AddSingleton<IRazorTemplateProvider>(
-                new InMemoryRazorTemplateProvider(
-                    RazorTemplate.Create(name, text)))
+            .AddSingleton<IRazorTemplateProvider>(templateProvider)
             .AddLogging(l => l.ClearProviders());
 
         configureServices.Invoke(services);
@@ -107,7 +110,7 @@ public static class RazorTemplateRenderer
         var result = await services
             .BuildServiceProvider()
             .GetRequiredService<IRazorTemplateRenderer>()
-            .Render(name, parameters, ct);
+            .Render(name, parameters, ct).ConfigureAwait(false);
 
         return result;
     }

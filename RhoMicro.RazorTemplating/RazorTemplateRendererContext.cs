@@ -13,13 +13,13 @@ internal sealed class RazorTemplateRendererContext(
     public async ValueTask<ComponentTypeLifetime> GetComponentType(String name, CancellationToken ct)
     {
         var key = new RazorTemplateCacheKey(name);
-        var template = await cache.GetOrCreateAsync<RazorTemplate>(
+        var template = await cache.GetOrCreateAsync(
             key,
             async e =>
             {
-                var result = await provider.LoadTemplate(name, ct);
+                var result = await provider.LoadTemplate(name, ct).ConfigureAwait(false);
 
-                await configuration.Configure(e, result);
+                await configuration.Configure(e, result).ConfigureAwait(false);
 
                 e.RegisterPostEvictionCallback((_, value, _, _) =>
                 {
@@ -30,14 +30,14 @@ internal sealed class RazorTemplateRendererContext(
                 });
 
                 return result;
-            });
+            }).ConfigureAwait(false);
 
         if (template is null)
         {
             throw new InvalidOperationException("Unable to retrieve razor template from cache.");
         }
 
-        var type = await template.GetComponentType(compiler, ct);
+        var type = await template.GetComponentType(compiler, ct).ConfigureAwait(false);
 
         return type;
     }
