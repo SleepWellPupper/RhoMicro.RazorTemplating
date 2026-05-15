@@ -97,8 +97,10 @@ public static class RazorTemplateRenderer
 
         const String name = "Template";
 
-        using var template = RazorTemplate.Create(name, text);
-        var templateProvider = new InMemoryRazorTemplateProvider(template);
+#pragma warning disable CA2000 // instance is disposed by provider
+        var template = RazorTemplate.Create(name, text);
+#pragma warning restore CA2000
+        using var templateProvider = new InMemoryRazorTemplateProvider(template);
 
         var services = new ServiceCollection()
             .AddRazorTemplating()

@@ -33,11 +33,11 @@ public static class ServiceCollectionExtensions
         {
             services.AddLogging();
             services.AddMemoryCache();
-            services.TryAddSingleton<RazorTemplateCompiler>();
-            services.TryAddSingleton<IRazorTemplateRenderer, DefaultRazorTemplateRenderer>();
-            services.TryAddSingleton<IRazorTemplateProvider, SampleRazorTemplateProvider>();
-            services.TryAddSingleton<IMemoryCacheEntryConfiguration, NullMemoryCacheEntryConfiguration>();
-            services.TryAddSingleton<RazorTemplateRendererContext>();
+            services.TryAddScoped<RazorTemplateCompiler>();
+            services.TryAddScoped<IRazorTemplateRenderer, DefaultRazorTemplateRenderer>();
+            services.TryAddScoped<IRazorTemplateProvider, SampleRazorTemplateProvider>();
+            services.TryAddScoped<IMemoryCacheEntryConfiguration, NullMemoryCacheEntryConfiguration>();
+            services.TryAddScoped<RazorTemplateRendererContext>();
             services.TryAddSingleton(RazorTemplateCompilerOptions.Default);
 
             return services;

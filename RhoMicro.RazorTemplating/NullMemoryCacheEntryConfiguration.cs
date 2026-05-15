@@ -8,6 +8,8 @@ internal sealed class NullMemoryCacheEntryConfiguration : IMemoryCacheEntryConfi
 {
     public async ValueTask Configure(ICacheEntry entry, RazorTemplate template)
     {
-        
+        entry.AbsoluteExpiration = null;
+        entry.SlidingExpiration = null;
+        entry.AbsoluteExpirationRelativeToNow = null;
     }
 }
