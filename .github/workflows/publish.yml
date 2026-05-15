@@ -19,8 +19,8 @@ jobs:
     - name: Restore
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore --property:Version=${{ github.ref }}
+      run: dotnet build --no-restore --property:Version=${{ github.ref_name }}
     - name: Test
       run: dotnet test --no-build --verbosity normal
     - name: Publish
-      run: dotnet nuget publish --skip-duplicate --api-key=${{ secrets.NUGET_API_KEY }}
+      run: dotnet nuget push --skip-duplicate --api-key=${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json ./**/*.nupkg
