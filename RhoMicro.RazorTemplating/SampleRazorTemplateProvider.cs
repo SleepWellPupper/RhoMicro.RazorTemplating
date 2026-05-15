@@ -2,7 +2,7 @@
 
 namespace RhoMicro.RazorTemplating;
 
-internal sealed class SampleRazorTemplateProvider() : IRazorTemplateProvider
+internal sealed class SampleRazorTemplateProvider : IRazorTemplateProvider
 {
     public async ValueTask<RazorTemplate> LoadTemplate(String name, CancellationToken ct = default)
         => RazorTemplate.Create(

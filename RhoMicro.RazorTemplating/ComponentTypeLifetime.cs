@@ -84,5 +84,7 @@ internal sealed class ComponentTypeLifetime : IDisposable
         {
             _lock.ExitWriteLock();
         }
+        
+        _lock.Dispose();
     }
 }

@@ -562,7 +562,7 @@ public class RazorTemplateRendererTests
         // Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(async () =>
             await renderer.Render("T1", TestContext.Current.CancellationToken));
-        Assert.Contains(expectedTrace, exception.Message);
+        Assert.Contains(expectedTrace, exception.Message, StringComparison.Ordinal);
     }
 
     [Fact]

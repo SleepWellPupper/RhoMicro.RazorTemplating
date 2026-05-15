@@ -29,7 +29,7 @@ internal sealed class RazorSourceText : AdditionalText
         RazorTemplate template,
         CancellationToken ct)
     {
-        var sourceText = await template.GetText(ct);
+        var sourceText = await template.GetText(ct).ConfigureAwait(false);
         var result = new RazorSourceText(template, sourceText);
         return result;
     }

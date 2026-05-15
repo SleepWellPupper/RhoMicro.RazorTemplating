@@ -26,7 +26,7 @@ public abstract class RazorTemplate : IDisposable
         internal override async ValueTask<SourceText> GetText(CancellationToken ct)
         {
             using var reader = new StreamReader(source, leaveOpen: true);
-            var text = await reader.ReadToEndAsync(ct);
+            var text = await reader.ReadToEndAsync(ct).ConfigureAwait(false);
             var result = SourceText.From(text);
             return result;
         }
@@ -39,7 +39,13 @@ public abstract class RazorTemplate : IDisposable
 
     private ComponentTypeLifetime? _component;
     private readonly SemaphoreSlim _gate = new(1, 1);
+    /// <summary>
+    /// Gets the name of this template.
+    /// </summary>
     public String Name { get; }
+    /// <summary>
+    /// Gets the names of templates that this template depends on.
+    /// </summary>
     public ImmutableHashSet<String> Dependencies { get; private init; } = [];
 
     /// <summary>
@@ -84,21 +90,23 @@ public abstract class RazorTemplate : IDisposable
         params ImmutableHashSet<String> dependencies) =>
         new StreamImplementation(name, textSource) { Dependencies = dependencies };
 
-    internal async ValueTask<ComponentTypeLifetime> GetComponentType(RazorTemplateCompiler compiler, CancellationToken ct = default)
+    internal async ValueTask<ComponentTypeLifetime> GetComponentType(RazorTemplateCompiler compiler,
+                                                                     CancellationToken ct = default)
     {
         if (_component is { } component)
         {
             return component;
         }
 
-        var result = await CompileComponentType(compiler, ct);
+        var result = await CompileComponentType(compiler, ct).ConfigureAwait(false);
 
         return result;
     }
 
-    private async ValueTask<ComponentTypeLifetime> CompileComponentType(RazorTemplateCompiler compiler, CancellationToken ct)
+    private async ValueTask<ComponentTypeLifetime> CompileComponentType(RazorTemplateCompiler compiler,
+                                                                        CancellationToken ct)
     {
-        await _gate.WaitAsync(ct);
+        await _gate.WaitAsync(ct).ConfigureAwait(false);
 
         try
         {
@@ -107,7 +115,7 @@ public abstract class RazorTemplate : IDisposable
                 return component;
             }
 
-            _component = await compiler.Compile(this, ct);
+            _component = await compiler.Compile(this, ct).ConfigureAwait(false);
 
             return _component;
         }
@@ -119,11 +127,31 @@ public abstract class RazorTemplate : IDisposable
 
     internal abstract ValueTask<SourceText> GetText(CancellationToken ct);
 
+    /// <inheritdoc/>
     public override String ToString() => Name;
 
-    void IDisposable.Dispose()
+    /// <summary>
+    /// <inheritdoc cref="IDisposable.Dispose"/>
+    /// </summary>
+    /// <param name="disposing">
+    /// Indicates whether the disposal was initiated from the <see cref="Dispose"/> method.
+    /// </param>
+    protected virtual void Dispose(Boolean disposing)
     {
+        if (!disposing)
+        {
+            return;
+        }
+
         _gate.Dispose();
         _component?.Dispose();
+    }
+
+#pragma warning disable CA1063
+    void IDisposable.Dispose()
+#pragma warning restore CA1063
+    {
+        GC.SuppressFinalize(this);
+        Dispose(disposing: true);
     }
 }
