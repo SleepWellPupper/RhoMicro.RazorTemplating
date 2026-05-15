@@ -1,9 +1,5 @@
 name: publish
 
-on:
-  push:
-    branches: [publish]
-
 jobs:
   publish:
     runs-on: ubuntu-latest
