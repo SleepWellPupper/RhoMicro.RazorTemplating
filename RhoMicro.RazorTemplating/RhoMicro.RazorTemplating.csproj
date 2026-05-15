@@ -5,7 +5,7 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <IsPackable>true</IsPackable>
     <Description>Provides in-process compilation and rendering of razor template source code, e.g. for email templating.</Description>
-    <PackageTags>razor;email;template;templating;blazor;component</PackageTags>
+    <PackageTags>razor;email;template;templating;blazor;component;components</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
