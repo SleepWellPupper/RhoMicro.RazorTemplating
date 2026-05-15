@@ -19,6 +19,9 @@
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <RepositoryBranch>publish</RepositoryBranch>
+    <EmbedAllSources>true</EmbedAllSources>
+    <Deterministic>true</Deterministic>
     <EmbedUntrackedResources>true</EmbedUntrackedResources>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageLicenseExpression>MPL-2.0</PackageLicenseExpression>
