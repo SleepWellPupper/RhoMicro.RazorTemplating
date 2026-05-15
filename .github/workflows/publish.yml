@@ -19,7 +19,7 @@ jobs:
     - name: Restore
       run: dotnet restore
     - name: Build
-      run: dotnet build --no-restore --property:Version=${{ github.ref }}
+      run: dotnet build --no-restore --property:Version=${{ github.ref_name }}
     - name: Test
       run: dotnet test --no-build --verbosity normal
     - name: Publish
