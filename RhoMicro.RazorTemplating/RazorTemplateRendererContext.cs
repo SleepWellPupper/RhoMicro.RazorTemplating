@@ -5,7 +5,7 @@ namespace RhoMicro.RazorTemplating;
 using Microsoft.Extensions.Caching.Memory;
 
 internal sealed class RazorTemplateRendererContext(
-    RazorTemplateCompiler compiler,
+    IRazorTemplateCompiler compiler,
     IRazorTemplateProvider provider,
     IMemoryCacheEntryConfiguration configuration,
     IMemoryCache cache)
