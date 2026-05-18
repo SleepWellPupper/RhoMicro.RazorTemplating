@@ -5,7 +5,10 @@ namespace RhoMicro.RazorTemplating;
 using System.Runtime.Loader;
 using Microsoft.AspNetCore.Components;
 
-internal sealed class ComponentTypeLifetime : IDisposable
+/// <summary>
+/// Manages the lifetime of a loaded component type.
+/// </summary>
+public sealed class ComponentTypeLifetime : IDisposable
 {
     private sealed class Scope(ComponentTypeLifetime lifetime) : IDisposable
     {
@@ -30,6 +33,9 @@ internal sealed class ComponentTypeLifetime : IDisposable
         _alc = alc;
     }
 
+    /// <summary>
+    /// Gets the loaded component type.
+    /// </summary>
     public Type Type
     {
         get
@@ -44,6 +50,12 @@ internal sealed class ComponentTypeLifetime : IDisposable
     private AssemblyLoadContext? _alc;
     private Type? _type;
 
+    /// <summary>
+    /// Prevents the type from being unloaded until the returned value is disposed.
+    /// </summary>
+    /// <returns>
+    /// An object that, until disposed, prevents the component type from being unloaded.
+    /// </returns>
     public IDisposable PreventDisposal()
     {
         _lock.EnterReadLock();
@@ -51,7 +63,7 @@ internal sealed class ComponentTypeLifetime : IDisposable
         return new Scope(this);
     }
 
-    public static ComponentTypeLifetime Create(Stream componentPeStream, params Stream[] additionalPeStreams)
+    internal static ComponentTypeLifetime Create(Stream componentPeStream, params Stream[] additionalPeStreams)
     {
         var alc = new AssemblyLoadContext(name: null, isCollectible: true);
         componentPeStream.Seek(0, SeekOrigin.Begin);
@@ -70,6 +82,7 @@ internal sealed class ComponentTypeLifetime : IDisposable
         return result;
     }
 
+    /// <inheritdoc />
     public void Dispose()
     {
         _lock.EnterWriteLock();

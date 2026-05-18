@@ -90,8 +90,9 @@ public abstract class RazorTemplate : IDisposable
         params ImmutableHashSet<String> dependencies) =>
         new StreamImplementation(name, textSource) { Dependencies = dependencies };
 
-    internal async ValueTask<ComponentTypeLifetime> GetComponentType(RazorTemplateCompiler compiler,
-                                                                     CancellationToken ct = default)
+    internal async ValueTask<ComponentTypeLifetime> GetComponentType(
+        IRazorTemplateCompiler compiler,
+        CancellationToken ct = default)
     {
         if (_component is { } component)
         {
@@ -103,8 +104,9 @@ public abstract class RazorTemplate : IDisposable
         return result;
     }
 
-    private async ValueTask<ComponentTypeLifetime> CompileComponentType(RazorTemplateCompiler compiler,
-                                                                        CancellationToken ct)
+    private async ValueTask<ComponentTypeLifetime> CompileComponentType(
+        IRazorTemplateCompiler compiler,
+        CancellationToken ct)
     {
         await _gate.WaitAsync(ct).ConfigureAwait(false);
 

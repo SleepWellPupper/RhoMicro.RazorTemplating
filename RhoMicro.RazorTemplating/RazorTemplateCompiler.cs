@@ -19,6 +19,7 @@ internal sealed partial class RazorTemplateCompiler(
     IRazorTemplateProvider templates,
     ILogger<RazorTemplateCompiler> logger,
     RazorTemplateCompilerOptions options)
+    : IRazorTemplateCompiler
 {
     readonly struct RazorTemplateDependencyTreeBuilder(
         IRazorTemplateProvider templates,
